@@ -1,5 +1,6 @@
 // a list of all possible problem types
 // TODO add while loops
+// TODO make each type of mutator a type of for loop to allow for better customization?
 const ALL_PROBLEM_TYPES = [
     "forLoop"
 ];
@@ -99,6 +100,16 @@ function getRandomText() {
 }
 
 /**
+ * Get a random number [min, max).
+ * @param {Number} min 
+ * @param {Number} max 
+ * @returns {Number}
+ */
+function getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+/**
 * Generate a code example to display to the user as a syntax problem.
 * @returns {String} problemText
 */
@@ -111,15 +122,13 @@ function generateProblem() {
 
         if (["+=", "*="].includes(mutator)) {
             // generate start from [0,4] for +=, [1-4] for *=
-            let start = Math.floor(Math.random() * 5);
-            if (start === 0 && mutator == "*=") start++;
+            let start = mutator == "+=" ? getRandomNumber(0, 5) : getRandomNumber(1, 5);
 
             // generate end from [start,start+9]
-            let end = start + Math.ceil(Math.random() * 10);
+            let end = getRandomNumber(start, start + 10);
 
             // generate step from [1, 4] for +=, [2, 4] for *=
-            let step = Math.ceil(Math.random() * 5);
-            if (step === 1 && mutator == "*=") step++;
+            let step = mutator == "+=" ? getRandomNumber(1, 5) : getRandomNumber(2, 5);
 
             // randomly select comparator for variety
             let comparator = selectRandom(["<", "<="]);
@@ -134,9 +143,9 @@ function generateProblem() {
             answer = new Function(`let a = ""; ${header} {\n\ta += x + "\\n";\n} return a;`)().trim();
         }
         else if (["-="].includes(mutator)) {
-            const end = Math.ceil(Math.random() * 5);
-            const start = end + Math.ceil(Math.random() * 10);
-            const step = Math.ceil(Math.random() * 5);
+            const end = getRandomNumber(1, 5);
+            const start = getRandomNumber(end, end + 10);
+            const step = getRandomNumber(1, 5);
 
             // randomly select comparator for variety
             const comparator = selectRandom([">", ">="]);
