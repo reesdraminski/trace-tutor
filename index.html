@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>Tracing Tutor</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="stylesheet" href="codemirror/codemirror.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+        <section>
+            <div id="notification" style="display: none;"></div>
+
+            <div class="container">
+                <div style="text-align: center;">
+                    <h1 style="margin-bottom: 0;">Syntax Tutor</h1>
+                    <p id="score">
+                        Score: 0
+                    </p>
+                </div>
+
+                <pre id="code"></pre>
+
+                <h2 id="prompt">What would be the output of this program?</h2>
+                <textarea id="answer"></textarea>
+
+                <br><br>
+                <button id="submit">Check Answer</button>
+            </div>
+        </section>
+
+        <footer>
+            <span style="margin-left: 5px; font-weight: bold;">Customize Problem Types:</span>
+
+            <ul id="problemTypes"></ul>
+        </footer>
+
+        <script src="codemirror/codemirror.js"></script>
+
+        <script src="codemirror/addon/runmode/runmode.js"></script>
+        <script src="codemirror/mode/javascript/javascript.js"></script>
+
+        <script src="js/app.js"></script>
+    </body>
+</html>
