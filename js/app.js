@@ -1,5 +1,4 @@
 // a list of all possible problem types
-// TODO add while loops
 // TODO make each type of mutator a type of for loop to allow for better customization?
 const ALL_PROBLEM_TYPES = [
     "forLoop",
@@ -154,7 +153,7 @@ function generateForLoop(variableName) {
 }
 
 /**
- * 
+ * Generate a while loop header
  * @param {String} variableName 
  * @returns {String} header
  */
