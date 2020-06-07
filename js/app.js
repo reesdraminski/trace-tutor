@@ -1,5 +1,6 @@
 // a list of all possible problem types
 // TODO make each type of mutator a type of for loop to allow for better customization?
+// TODO add a string substring/array printing exercise for "secret message" type code tracing?
 const ALL_PROBLEM_TYPES = [
     "forLoop",
     "nestedForLoop",
