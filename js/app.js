@@ -2,7 +2,8 @@
 // TODO add while loops
 // TODO make each type of mutator a type of for loop to allow for better customization?
 const ALL_PROBLEM_TYPES = [
-    "forLoop"
+    "forLoop",
+    "nestedForLoop"
 ];
 
 // globals
@@ -110,6 +111,46 @@ function getRandomNumber(min, max) {
 }
 
 /**
+ * @returns {String} header
+ */
+function generateForLoop(variableName) {
+    // TODO make division work by generating start end and steps that are GCFs
+    const mutator = selectRandom(["+=", "-=", "*="]);
+
+    if (["+=", "*="].includes(mutator)) {
+        // generate start from [0,4] for +=, [1-4] for *=
+        let start = mutator == "+=" ? getRandomNumber(0, 5) : getRandomNumber(1, 5);
+
+        // generate end from [start,start+9]
+        let end = getRandomNumber(start, start + 10);
+
+        // generate step from [1, 4] for +=, [2, 4] for *=
+        let step = mutator == "+=" ? getRandomNumber(1, 5) : getRandomNumber(2, 5);
+
+        // randomly select comparator for variety
+        let comparator = selectRandom(["<", "<="]);
+
+        // put together loop header
+        let header = `for (let ${variableName} = ${start}; ${variableName} ${comparator} ${end}; ${variableName} ${mutator} ${step})`;
+
+        return header;
+    }
+    else if (["-="].includes(mutator)) {
+        const end = getRandomNumber(1, 5);
+        const start = getRandomNumber(end, end + 10);
+        const step = getRandomNumber(1, 5);
+
+        // randomly select comparator for variety
+        const comparator = selectRandom([">", ">="]);
+
+        // put together loop header
+        const header = `for (let ${variableName} = ${start}; ${variableName} ${comparator} ${end}; ${variableName} ${mutator} ${step})`;
+
+        return header;
+    }
+}
+
+/**
 * Generate a code example to display to the user as a syntax problem.
 * @returns {String} problemText
 */
@@ -117,48 +158,25 @@ function generateProblem() {
     const problemType = selectRandom(selectedProblemTypes);
 
     if (problemType == "forLoop") {
-        // TODO make division work by generating start end and steps that are GCFs
-        const mutator = selectRandom(["+=", "-=", "*="]);
+        let header = generateForLoop("x");
 
-        if (["+=", "*="].includes(mutator)) {
-            // generate start from [0,4] for +=, [1-4] for *=
-            let start = mutator == "+=" ? getRandomNumber(0, 5) : getRandomNumber(1, 5);
+        // generate problem text to show to user
+        problem = `${header} {\n\tconsole.log(x);\n}`;
 
-            // generate end from [start,start+9]
-            let end = getRandomNumber(start, start + 10);
+        // execute loop to get correct answer
+        answer = new Function(`let a = ""; ${header} { a += x + "\\n"; } return a;`)().trim();
+    }
+    else if (problemType == "nestedForLoop") {
+        let outerHeader = generateForLoop("i");
+        let innerHeader = generateForLoop("j");
 
-            // generate step from [1, 4] for +=, [2, 4] for *=
-            let step = mutator == "+=" ? getRandomNumber(1, 5) : getRandomNumber(2, 5);
+        let operation = selectRandom("+", "-", "*");
 
-            // randomly select comparator for variety
-            let comparator = selectRandom(["<", "<="]);
+        // generate problem text to show to user
+        problem = `${outerHeader} {\n\t${innerHeader} {\n\t\tconsole.log(i ${operation} j);\n\t}\n}`;
 
-            // put together loop header
-            let header = `for (let x = ${start}; x ${comparator} ${end}; x ${mutator} ${step})`;
-
-            // generate problem text to show to user
-            problem = `${header} {\n\tconsole.log(x);\n}`;
-
-            // execute loop to get correct answer
-            answer = new Function(`let a = ""; ${header} {\n\ta += x + "\\n";\n} return a;`)().trim();
-        }
-        else if (["-="].includes(mutator)) {
-            const end = getRandomNumber(1, 5);
-            const start = getRandomNumber(end, end + 10);
-            const step = getRandomNumber(1, 5);
-
-            // randomly select comparator for variety
-            const comparator = selectRandom([">", ">="]);
-
-            // put together loop header
-            const header = `for (let x = ${start}; x ${comparator} ${end}; x ${mutator} ${step})`;
-
-            // generate problem text to show to user
-            problem = `${header} {\n\tconsole.log(x);\n}`;
-
-            // execute loop to get correct answer
-            answer = new Function(`let a = ""; ${header} {\n\ta += x + "\\n";\n} return a;`)().trim();
-        }
+        // execute loop to get correct answer
+        answer = new Function(`let a = ""; ${outerHeader} { ${innerHeader} { let num = i ${operation} j; a += num + "\\n"; } } return a;`)().trim();
     }
 
     // show problem text to user
