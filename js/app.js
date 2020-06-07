@@ -3,7 +3,8 @@
 // TODO make each type of mutator a type of for loop to allow for better customization?
 const ALL_PROBLEM_TYPES = [
     "forLoop",
-    "nestedForLoop"
+    "nestedForLoop",
+    "whileLoop"
 ];
 
 // globals
@@ -101,16 +102,18 @@ function getRandomText() {
 }
 
 /**
- * Get a random number [min, max).
+ * Get a random number [min, max].
  * @param {Number} min 
  * @param {Number} max 
  * @returns {Number}
  */
 function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 /**
+ * Generate a for loop header.
+ * @param {String} variableName
  * @returns {String} header
  */
 function generateForLoop(variableName) {
@@ -118,13 +121,13 @@ function generateForLoop(variableName) {
     const mutator = selectRandom(["+=", "-=", "*="]);
 
     if (["+=", "*="].includes(mutator)) {
-        // generate start from [0,4] for +=, [1-4] for *=
+        // generate start from [0,5] for +=, [1,5] for *=
         let start = mutator == "+=" ? getRandomNumber(0, 5) : getRandomNumber(1, 5);
 
         // generate end from [start,start+9]
         let end = getRandomNumber(start, start + 10);
 
-        // generate step from [1, 4] for +=, [2, 4] for *=
+        // generate step from [1, 5] for +=, [2, 5] for *=
         let step = mutator == "+=" ? getRandomNumber(1, 5) : getRandomNumber(2, 5);
 
         // randomly select comparator for variety
@@ -151,32 +154,71 @@ function generateForLoop(variableName) {
 }
 
 /**
+ * 
+ * @param {String} variableName 
+ * @returns {String} header
+ */
+function generateWhileLoop(variableName) {
+    let min = 5;
+    let initialValue = getRandomNumber(min, 15);
+    let comparator = selectRandom(["<", "<=", ">", ">="]);
+
+    let num = comparator.includes(">") ? getRandomNumber(0, initialValue - min) : getRandomNumber(initialValue, initialValue + 10);
+
+    let header = `let ${variableName} = ${initialValue};\n\nwhile (${variableName} ${comparator} ${num})`;
+
+    return header;
+}
+
+/**
 * Generate a code example to display to the user as a syntax problem.
 * @returns {String} problemText
 */
 function generateProblem() {
     const problemType = selectRandom(selectedProblemTypes);
 
+    const alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n",
+                        "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+
     if (problemType == "forLoop") {
-        let header = generateForLoop("x");
+        let variableName = selectRandom(alphabet);
+        let header = generateForLoop(variableName);
 
         // generate problem text to show to user
-        problem = `${header} {\n\tconsole.log(x);\n}`;
+        problem = `${header} {\n\tconsole.log(${variableName});\n}`;
 
         // execute loop to get correct answer
-        answer = new Function(`let a = ""; ${header} { a += x + "\\n"; } return a;`)().trim();
+        answer = new Function(`let _ = ""; ${header} { _ += ${variableName} + "\\n"; } return _;`)().trim();
     }
     else if (problemType == "nestedForLoop") {
-        let outerHeader = generateForLoop("i");
-        let innerHeader = generateForLoop("j");
+        // get variable names for loop counters
+        let varOne = selectRandom(alphabet);
+        let varTwo = selectRandom(alphabet);
 
+        // generate for loop headers
+        let outerHeader = generateForLoop(varOne);
+        let innerHeader = generateForLoop(varTwo);
+
+        // get operation that will be applied to the loop counters when logging
         let operation = selectRandom("+", "-", "*");
 
         // generate problem text to show to user
-        problem = `${outerHeader} {\n\t${innerHeader} {\n\t\tconsole.log(i ${operation} j);\n\t}\n}`;
+        problem = `${outerHeader} {\n\t${innerHeader} {\n\t\tconsole.log(${varOne} ${operation} ${varTwo});\n\t}\n}`;
 
         // execute loop to get correct answer
-        answer = new Function(`let a = ""; ${outerHeader} { ${innerHeader} { let num = i ${operation} j; a += num + "\\n"; } } return a;`)().trim();
+        answer = new Function(`let _ = ""; ${outerHeader} { ${innerHeader} { let num = ${varOne} ${operation} ${varTwo}; _ += num + "\\n"; } } return _;`)().trim();
+    }
+    else if (problemType == "whileLoop") {
+        let variableName = "result";
+        let header = generateWhileLoop(variableName);
+        let mutator = header.includes(">") ? selectRandom(["-="]) : selectRandom(["+=", "*="]);
+        let step = mutator == "*=" ? getRandomNumber(2, 5) : getRandomNumber(1, 5);
+
+        // generate problem text to show to user
+        problem = `${header} {\n\t${variableName} ${mutator} ${step};\n}\n\nconsole.log(${variableName});`;
+
+        // execute loop to get correct answer
+        answer = new Function(`${header} { ${variableName} ${mutator} ${step}; } return ${variableName};`)();
     }
 
     // show problem text to user
