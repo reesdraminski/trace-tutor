@@ -6,5 +6,6 @@ Ruixiang Qi and Davide Fossati. 2020. Unlimited Trace Tutor: Learning Code Traci
 
 ## Novelty
 * Instead of using the Qi and Fossati's code generation method, I decided to use a lot of if statements, instead of changing a parse tree. I thought it would be easier to implement and also easier to read.
+* The loop exercises that Qi and Fossati's code generates are different than mine which initalize a variable and mutate it and print at the end. Mine is more focused on indices.
 * This is for JavaScript, while Qi and Fossati's is for Java.
 * This is a web platform, while Qi and Fossati's is a Java application.
